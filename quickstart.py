@@ -14,7 +14,7 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
-  """TODO 
+"""TODO 
   * GET EMAIL BY USER 
   * GET EMAIL ID TO REPLY
   * SEND EMAIL BODY TO OPENAI API
@@ -40,9 +40,6 @@ def recieve_email(service):
 
 
 def main():
-  """Shows basic usage of the Gmail API.
-  Lists the user's Gmail labels.
-  """
   creds = None
   # The file token.json stores the user's access and refresh tokens, and is
   # created automatically when the authorization flow completes for the first
@@ -65,7 +62,9 @@ def main():
   try:
     # Call the Gmail API
     service = build("gmail", "v1", credentials=creds)
-    recieve_email(service)
+    #! recieve_email(service) (used to get email)
+    #! send_Email(service, recipent) (used to send email)
+    
   except HttpError as error:
   # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")

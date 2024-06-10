@@ -40,6 +40,8 @@ def recieve_email(service):
 
 
 def main():
+  
+  #-------------------------------------------- AUTH STUFF -------------------------------------------------------------------
   creds = None
   # The file token.json stores the user's access and refresh tokens, and is
   # created automatically when the authorization flow completes for the first
@@ -59,8 +61,10 @@ def main():
     with open("token.json", "w") as token:
       token.write(creds.to_json())
 
+  #-------------------------------------------- AUTH STUFF -------------------------------------------------------------------
+
   try:
-    # Call the Gmail API
+    # Call the Gmail API, use either function to recieve or send
     service = build("gmail", "v1", credentials=creds)
     #! recieve_email(service) (used to get email)
     #! send_Email(service, recipent) (used to send email)

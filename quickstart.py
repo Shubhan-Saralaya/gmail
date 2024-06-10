@@ -14,6 +14,13 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
+  """TODO 
+  * GET EMAIL BY USER 
+  * GET EMAIL ID TO REPLY
+  * SEND EMAIL BODY TO OPENAI API
+  * (CAN DO) RUN ON SERVER TO KEEP LOOKING FOR EMAILS FROM A CERTAIN USER
+  """
+
 def send_Email(service, recipent):
     emailReplyMsg = 'Just a test!'
     mimeReply = MIMEMultipart()

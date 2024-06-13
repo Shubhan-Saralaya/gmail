@@ -10,15 +10,14 @@ client = AzureOpenAI(
   api_version="2024-02-01"
 )
 
+def create_chat(body):
+  response = client.chat.completions.create(
+      model="probosys-demo", # model = "deployment_name".
+      messages=[
+          {"role": "system", "content": "You are a helpful assistant."},
+          {"role": "user", "content": body},
 
-
-response = client.chat.completions.create(
-    model="probosys-demo", # model = "deployment_name".
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What are the best places to visit in spain?"},
-        
-    ]
-)
-
-print(response.choices[0].message.content)
+      ]
+  )
+  print(response.choices[0].message.content)
+  return(response.choices[0].message.content)

@@ -33,7 +33,7 @@ def watch(service):
       for part in MimeMsg.walk():
         if part.get_content_type() == 'text/plain':
           body = part.get_payload(decode=True).decode('utf-8')
-          print('#',body,'#')
+          #print('#',body,'#')
           reply_body=create_chat(body)
           #print(reply_body)
       #MimeMsg = email.message_from_bytes(base64.urlsafe_b64decode((service.users().messages().get(userId='me',id=ID['id'],format='raw').execute())['raw'].encode("ASCII")))
@@ -135,10 +135,8 @@ def main():
   try:
     # Call the Gmail API, use either function to recieve or send
     service = build("gmail", "v1", credentials=creds)
-    x=0
-    while x<30:
+    while 1:
       watch(service)
-      x+=1
 
   
   except HttpError as error:

@@ -12,6 +12,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import icalendar 
 
 timern= time.time()
 
@@ -25,23 +26,31 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 version = 3
 
 def watch(service):
-  messagegot=service.users().messages().list(userId='me',maxResults=5,q='is:unread').execute()
-  #print(timern)
-  if(len(messagegot)>1):
+  
+  #?gets unread message
+  messagegot=service.users().messages().list(userId='me',maxResults=5,q='is:unread').execute() 
+  #?if unread found
+  if(len(messagegot)>1): 
     for ID in messagegot.get("messages",[]):
+      
+      email_body,threadID,subject = "","",""
       MimeMsg = email.message_from_bytes(base64.urlsafe_b64decode((service.users().messages().get(userId='me',id=ID['id'],format='raw').execute())['raw'].encode("ASCII")))
-      for part in MimeMsg.walk():
+      
+      #? getting invite content
+      invite_body = get_invite(service,ID) 
+      
+      #? getting email body & subject
+      for part in MimeMsg.walk(): 
         if part.get_content_type() == 'text/plain':
-          body = part.get_payload(decode=True).decode('utf-8')
-          #print('#',body,'#')
-          reply_body=create_chat(body)
-          #print(reply_body)
-      #MimeMsg = email.message_from_bytes(base64.urlsafe_b64decode((service.users().messages().get(userId='me',id=ID['id'],format='raw').execute())['raw'].encode("ASCII")))
+          email_body = part.get_payload(decode=True).decode('utf-8')
+          
       MimeMsg = service.users().messages().get(userId='me',id=ID['id'],format='full').execute()
+      
       threadID = MimeMsg['threadId']
+      references=None 
       
-      references=None
       
+      #? getting rest of the email body      
       for part in MimeMsg['payload']['headers']:
         if(part['name']=='From'):
           To_address=part['value']
@@ -52,7 +61,13 @@ def watch(service):
         if(references==None):
           if(part['name']=='References'):
             references= part['value']
-            print('set')
+      
+      body = invite_body + "\n" +email_body + subject
+      
+      #?getting reply from chat GPT 
+      reply_body= create_chat(body)
+          
+      
       reply_info={
         'body':reply_body,
         'message_Id':msg_Id,
@@ -61,43 +76,80 @@ def watch(service):
         'references':references,
         'subject':subject
       }
-      print(reply_info)
       if(mark_unread(service,ID)):
         send_Email(service,reply_info)
+        print('email sent to ' + To_address)
   else:
     time.sleep(2)
     
+#? getting calendar invite content
+def cal_details(data):
+  cal = icalendar.Calendar.from_ical(data)
+  for component in cal.walk():
+    if component.name == "VEVENT":
+      invite_content = component.get("summary")+"\n"+component.get('description')+"\n Meeting Start time:" + \
+      (component.get('dtstart').dt).strftime("%m/%d/%Y, %H:%M:%S")+"\n Meeting End time:" +  (component.get('dtend').dt).strftime("%m/%d/%Y, %H:%M:%S")
+      print(invite_content)
+      #end_time = component.get('dtend').dt
+      #location = component.get('location')
+      #print(invite_content)
+      return invite_content
+  else:
+    print("error getting invite data")
+    return "data"
     
+#? getting calendar invite
+def get_invite(service,ID):
+  attachId = None
+  MimeMsg = service.users().messages().get(userId='me',id=ID['id'],format='full').execute()
+  parts = MimeMsg['payload']
+  if('attachmentId' in parts['body']):
+    attachId= parts['body']['attachmentId']
+  else:
+    for part in MimeMsg['payload'].get('parts', []):
+      if 'filename' in part and part['filename'].endswith('.ics'):
+        attachId= part['body']['attachmentId']
+  if(attachId != None):
+    data = (service.users().messages().attachments().get(userId='me',messageId=ID['id'],id=attachId).execute())['data'] 
+    file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
+    return cal_details(file_data)
+  else:
+    #print('no invite')
+    return ("No invite attached")
+
+  #attachId = parts['body']['attachmentId']
+  # data = (service.users().messages().attachments().get(userId='me',messageId=ID['id'],id=attachId).execute())['data'] 
+  # file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
+  # cal_details(file_data)
+  # print('??')
+
+#? marking file as read after sending    
 def mark_unread(service,ID):
-  print(service.users().messages().modify(userId='me',id=ID['id'],body={'removeLabelIds':'UNREAD'}).execute())
+  #print(service.users().messages().modify(userId='me',id=ID['id'],body={'removeLabelIds':'UNREAD'}).execute())
+  service.users().messages().modify(userId='me',id=ID['id'],body={'removeLabelIds':'UNREAD'}).execute()
   return True
   
-
+#? function to send music
 def send_Email(service, reply_info):
     #print(reply_info)
     emailReplyMsg = reply_info['body']
     mimeReply = MIMEMultipart()
-    mimeReply['to'] = reply_info['to'] #! CHANGE TO RECIPIANT EMAIL
-    # mimeReply['From']='me'
+    mimeReply['to'] = reply_info['to'] 
+    #*mimeReply['to']='saralayashubhan@gmail.com'
     mimeReply['subject'] = reply_info['subject']
     mimeReply['threadId']=reply_info['threadID']
     mimeReply['in-reply-to']=reply_info['message_Id']
     if(reply_info['references']!=None):
       mimeReply['References']=reply_info['references']
-    #mimeReply['to'] = 'saralayashubhan@gmail.com' #! CHANGE TO RECIPIANT EMAIL
     mimeReply['From']='me'
-    #mimeReply['subject'] = 'testing3'
-    #mimeReply['threadId']='1900e33c19ae1b21'
-    #mimeReply['in-reply-to']='<CAMxsQxaARAAJrfQcqVcFWcpQUaO_2Y2vZ=cOXoaCFuSeyv3XHg@mail.gmail.com>'
     mimeReply.attach(MIMEText(emailReplyMsg,'plain'))
     raw_string = base64.urlsafe_b64encode(mimeReply.as_bytes()).decode()
+    
+    
+    
     message = service.users().messages().send(userId='me',body={'raw':raw_string}).execute()
     print(message)
-    
 
-   
- 
-    
 def recieve_email(service):
     messagegot= service.users().messages().list(userId='me',maxResults=1).execute()
     for ID in messagegot.get("messages",[]):

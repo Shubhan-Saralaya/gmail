@@ -1,0 +1,43 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Asia/Kolkata
+X-LIC-LOCATION:Asia/Kolkata
+BEGIN:STANDARD
+TZOFFSETFROM:+0530
+TZOFFSETTO:+0530
+TZNAME:IST
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=Asia/Kolkata:20240615T210000
+DTEND;TZID=Asia/Kolkata:20240615T220000
+DTSTAMP:20240614T171519Z
+ORGANIZER;CN=Pushparaj Chandan:mailto:pushparaj.chandan@probosys.com
+UID:57kbb98h63d1ttqvaqr97bac68@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=Pushparaj Chandan;X-NUM-GUESTS=0:mailto:pushparaj.chandan@probosys.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=Shubhan Saralaya;X-NUM-GUESTS=0:mailto:shubhan@probosys.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/que-ahrn-wnj
+X-MICROSOFT-CDO-OWNERAPPTID:437255065
+CREATED:20240614T171518Z
+DESCRIPTION:for testing\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Google Meet: https://mee
+ t.google.com/que-ahrn-wnj\nOr dial: (US) +1 304-935-5379 PIN: 997942461#\nM
+ ore phone numbers: https://tel.meet/que-ahrn-wnj?pin=3722447980296&hs=7\n\n
+ Learn more about Meet at: https://support.google.com/a/users/answer/9282720
+ \n\nPlease do not edit this section.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20240614T171518Z
+LOCATION:zoom
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Test Meeting
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR

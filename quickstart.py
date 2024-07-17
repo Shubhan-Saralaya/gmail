@@ -20,8 +20,9 @@ timern= time.time()
 SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
 """TODO 
-  * GET EMAIL ID TO REPLY (Done)
-  * KEEP LOOKING FOR EMAILS FROM A CERTAIN USER (Done- looking for any new unread emails)
+
+  * Reply to user name
+  * Ways to keep program active/standby
   """
 version = 3
 
@@ -80,7 +81,7 @@ def watch(service):
         send_Email(service,reply_info)
         print('email sent to ' + To_address)
   else:
-    time.sleep(2)
+    time.sleep(1)
     
 #? getting calendar invite content
 def cal_details(data):
@@ -90,9 +91,6 @@ def cal_details(data):
       invite_content = component.get("summary")+"\n"+component.get('description')+"\n Meeting Start time:" + \
       (component.get('dtstart').dt).strftime("%m/%d/%Y, %H:%M:%S")+"\n Meeting End time:" +  (component.get('dtend').dt).strftime("%m/%d/%Y, %H:%M:%S")
       print(invite_content)
-      #end_time = component.get('dtend').dt
-      #location = component.get('location')
-      #print(invite_content)
       return invite_content
   else:
     print("error getting invite data")
@@ -114,24 +112,15 @@ def get_invite(service,ID):
     file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
     return cal_details(file_data)
   else:
-    #print('no invite')
     return ("No invite attached")
-
-  #attachId = parts['body']['attachmentId']
-  # data = (service.users().messages().attachments().get(userId='me',messageId=ID['id'],id=attachId).execute())['data'] 
-  # file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
-  # cal_details(file_data)
-  # print('??')
 
 #? marking file as read after sending    
 def mark_unread(service,ID):
-  #print(service.users().messages().modify(userId='me',id=ID['id'],body={'removeLabelIds':'UNREAD'}).execute())
   service.users().messages().modify(userId='me',id=ID['id'],body={'removeLabelIds':'UNREAD'}).execute()
   return True
   
 #? function to send music
 def send_Email(service, reply_info):
-    #print(reply_info)
     emailReplyMsg = reply_info['body']
     mimeReply = MIMEMultipart()
     mimeReply['to'] = reply_info['to'] 
